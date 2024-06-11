@@ -46,3 +46,19 @@ def deps do
   ]
 end
 ```
+
+Add the following to your supervision tree on `application.ex`:
+
+```elixir
+children = [
+  EredisSub
+]
+```
+
+Optional configuration can be passed to `eredis` and `eredis_sub`, check [their docs](https://hexdocs.pm/eredis/readme.html#connect-a-client-start_link-1):
+
+```elixir
+children = [
+  {EredisSub, [database: 2, username: "foo", password: "bar"]}
+]
+```

@@ -26,6 +26,14 @@ defmodule EredisSub do
 
       metadata_example = %{subscribed_at: DateTime.utc_now()}
       EredisSub.Server.subscribe("my_channel", {MyModule, :handle, metadata_example})
+
+  ### Add the following to your supervision tree:
+
+      children = [
+        EredisSub
+      ]
+
+  Optional configuration can be passed to `eredis` and `eredis_sub`, check [their docs](https://hexdocs.pm/eredis/readme.html#connect-a-client-start_link-1).
   """
   alias EredisSub.Server
 
