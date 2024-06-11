@@ -1,37 +1,7 @@
 defmodule EredisSub.Server do
   @moduledoc """
-  Publishes binary messages to Redis Pub/Sub channels.
-  Subscribes to channels and calls a handler function when a message is received.
-
-  ## Usage
-
-  ### Publish
-
-  ```elixir
-  EredisSub.Server.publish("my_channel", "Hello, world!")
-  ```
-
-  ### Subscribe
-
-  Implement the behaviour to be called when a message is received:
-
-  ```elixir
-  defmodule MyModule do
-    @behaviour EredisSub.Handler
-
-    @impl EredisSub.Handler
-    def handle(message, metadata) do
-      # Do something...
-    end
-  end
-  ```
-
-  Subscribe to a channel:
-
-  ```elixir
-  metadata_example = %{subscribed_at: DateTime.utc_now()}
-  EredisSub.Server.subscribe("my_channel", {MyModule, :handle, metadata_example})
-  ```
+  Holds internal state for `EredisSub`.
+  Do not use this module directly. Instead, use `EredisSub`.
   """
 
   use GenServer

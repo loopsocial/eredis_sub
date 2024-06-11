@@ -1,15 +1,36 @@
 defmodule EredisSub do
   @moduledoc """
-  Documentation for `EredisSub`.
+  Publishes binary messages to Redis Pub/Sub channels.
+  Subscribes to channels and calls a handler function when a message is received.
+
+  ## Usage
+
+  ### Publish
+
+      EredisSub.Server.publish("my_channel", "Hello, world!")
+
+  ### Subscribe
+
+  Implement the behaviour to be called when a message is received:
+
+      defmodule MyModule do
+        @behaviour EredisSub.Handler
+
+        @impl EredisSub.Handler
+        def handle(message, metadata) do
+          # Do something...
+        end
+      end
+
+  Subscribe to a channel:
+
+      metadata_example = %{subscribed_at: DateTime.utc_now()}
+      EredisSub.Server.subscribe("my_channel", {MyModule, :handle, metadata_example})
   """
+  alias EredisSub.Server
 
-  def start_link(config \\ []) do
-    EredisSub.Server.start_link(config)
-  end
-
-  def child_spec(config) do
-    EredisSub.Server.child_spec(config)
-  end
+  def start_link(config \\ []), do: Server.start_link(config)
+  def child_spec(config), do: Server.child_spec(config)
 
   @doc """
   Publish a message to a channel.
@@ -20,7 +41,7 @@ defmodule EredisSub do
       :ok
   """
   def publish(channel, message) do
-    EredisSub.Server.publish(channel, message)
+    Server.publish(channel, message)
   end
 
   @doc """
@@ -41,7 +62,7 @@ defmodule EredisSub do
       :ok
   """
   def subscribe(channel, handler) do
-    EredisSub.Server.subscribe(channel, handler)
+    Server.subscribe(channel, handler)
   end
 
   @doc """
@@ -53,6 +74,6 @@ defmodule EredisSub do
       :ok
   """
   def unsubscribe_all(channel) do
-    EredisSub.Server.unsubscribe_all(channel)
+    Server.unsubscribe_all(channel)
   end
 end
