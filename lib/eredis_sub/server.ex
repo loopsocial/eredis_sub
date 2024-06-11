@@ -38,21 +38,21 @@ defmodule EredisSub.Server do
   require Logger
 
   # Public API
-  def start_link(config \\ []) when is_list(config) do
-    name = Keyword.get(config, :name, __MODULE__)
+  def start_link(config, name \\ __MODULE__) when is_list(config) do
     GenServer.start_link(__MODULE__, config, name: name)
   end
 
-  def publish(channel, message) when is_binary(channel) and is_binary(message) do
-    GenServer.call(__MODULE__, {:publish, channel, message})
+  def publish(channel, message, name \\ __MODULE__)
+      when is_binary(channel) and is_binary(message) do
+    GenServer.call(name, {:publish, channel, message})
   end
 
-  def subscribe(channel, {mod, fun, metadata}) do
-    GenServer.call(__MODULE__, {:subscribe, channel, {mod, fun, metadata}})
+  def subscribe(channel, {mod, fun, metadata}, name \\ __MODULE__) do
+    GenServer.call(name, {:subscribe, channel, {mod, fun, metadata}})
   end
 
-  def unsubscribe_all(channel) do
-    GenServer.call(__MODULE__, {:unsubscribe_all, channel})
+  def unsubscribe_all(channel, name \\ __MODULE__) do
+    GenServer.call(name, {:unsubscribe_all, channel})
   end
 
   # Private API
@@ -79,23 +79,33 @@ defmodule EredisSub.Server do
     {:reply, :ok, state}
   end
 
+  # Simplify this for brevity, keep the same functionality
   def handle_call({:subscribe, channel, mfa}, _from, state) do
-    if channel not in state.subscriptions do
-      :ok = :eredis_sub.subscribe(state.sub_conn, [String.to_charlist(channel)])
-    end
+    response = :eredis_sub.subscribe(state.sub_conn, [String.to_charlist(channel)])
 
-    updated_subscriptions =
-      Map.update(state.subscriptions, channel, [mfa], fn subscriptions ->
-        [mfa | subscriptions]
-      end)
+    subscriptions =
+      if response == :ok do
+        Map.update(state.subscriptions, channel, [mfa], fn subscriptions ->
+          [mfa | subscriptions]
+        end)
+      else
+        state.subscriptions
+      end
 
-    {:reply, :ok, %{state | subscriptions: updated_subscriptions}}
+    {:reply, response, %{state | subscriptions: subscriptions}}
   end
 
   def handle_call({:unsubscribe_all, channel}, _from, state) do
-    :ok = :eredis_sub.unsubscribe(state.sub_conn, [String.to_charlist(channel)])
-    updated_subscriptions = Map.delete(state.subscriptions, channel)
-    {:reply, :ok, %{state | subscriptions: updated_subscriptions}}
+    response = :eredis_sub.unsubscribe(state.sub_conn, [String.to_charlist(channel)])
+
+    subscriptions =
+      if response == :ok do
+        Map.delete(state.subscriptions, channel)
+      else
+        state.subscriptions
+      end
+
+    {:reply, response, %{state | subscriptions: subscriptions}}
   end
 
   def handle_info({:message, channel, msg, _client_pid}, state) do
@@ -119,26 +129,14 @@ defmodule EredisSub.Server do
     {:noreply, state}
   end
 
-  def handle_info({:eredis_connected, _client_pid}, state) do
-    {:noreply, state}
-  end
-
-  def handle_info({:eredis_disconnected, _client_pid}, state) do
-    {:noreply, state}
-  end
-
-  def handle_info({:eredis_reconnect_attempt, _pid}, state) do
-    {:noreply, state}
-  end
-
-  def handle_info({:eredis_reconnect_failed, _pid, _reason}, state) do
+  def handle_info(msg, state) do
+    Logger.info("[#{__MODULE__}] Unhandled message: #{inspect(msg)}.")
     {:noreply, state}
   end
 
   defp apply_no_link(channel, {mod, fun, args}) do
     Task.start(fn ->
       try do
-        Logger.info("Apply #{inspect(mod)}:#{inspect(fun)} with #{inspect(args)} on #{channel}.")
         apply(mod, fun, args)
       rescue
         e ->
