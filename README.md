@@ -1,3 +1,5 @@
+![Elixir CI](https://github.com/loopsocial/eredis_sub/actions/workflows/elixir.yml/badge.svg)
+
 # EredisSub
 
 Wraps `eredis` and `eredis_sub` functionallity for Elixir usage.
