@@ -7,22 +7,6 @@ Wraps `eredis` and `eredis_sub` functionallity for Elixir usage.
 - Publishes binary messages to Redis Pub/Sub channels.
 - Subscribes to channels and calls a handler function when a message is received.
 
-## Why not use `Phoenix.PubSub`?
-
-Because multiple applications in many programming languages can use Redis Pub/Sub,
-but they don't serialize their binary messages according to `Phoenix` schema.
-
-## Why not use `eredis` directly?
-
-That's also a great option. With `EredisSub` Elixir abstraction we intend to hide
-Erlang specific knowledge, for example Erlang strings and OTP processes. We changed
-the API to let clients subscribe a handler function to a Pub/Sub channel, similar
-to how [`:telemetry`](https://hexdocs.pm/telemetry/readme.html) attaches handlers.
-
-We sacrificed flexibility on client process architecture, for a simpler mental model.
-If you need to handle message passing or a pool of processes, for example to handle
-heavier loads, use `:eredis` directly.
-
 ## Usage
 
 ### Publish
@@ -78,3 +62,21 @@ children = [
   {EredisSub, [database: 2, username: "foo", password: "bar"]}
 ]
 ```
+
+## Motivations
+
+### Why not use `Phoenix.PubSub`?
+
+Because multiple applications in many programming languages can use Redis Pub/Sub,
+but they don't serialize their binary messages according to `Phoenix` schema.
+
+### Why not use `eredis` directly?
+
+That's also a great option. With `EredisSub` Elixir abstraction we intend to hide
+Erlang specific knowledge, for example Erlang strings and OTP processes. We changed
+the API to let clients subscribe a handler function to a Pub/Sub channel, similar
+to how [`:telemetry`](https://hexdocs.pm/telemetry/readme.html) attaches handlers.
+
+We sacrificed flexibility on client process architecture, for a simpler mental model.
+If you need to handle message passing or a pool of processes, for example to handle
+heavier loads, use `:eredis` directly.
