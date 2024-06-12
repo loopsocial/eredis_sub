@@ -8,6 +8,7 @@ defmodule EredisSub.MixProject do
     [
       app: :eredis_sub,
       description: "Elixir wrapper for Eredis pub/sub functionality ",
+      source_url: @source_url,
       version: @version,
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
