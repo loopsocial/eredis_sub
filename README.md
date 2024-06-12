@@ -81,3 +81,8 @@ to how [`:telemetry`](https://hexdocs.pm/telemetry/readme.html) attaches handler
 We sacrificed flexibility on client process architecture, for a simpler mental model.
 If you need to handle message passing or a pool of processes, for example to handle
 heavier loads, use [`eredis`](https://hexdocs.pm/eredis/) directly.
+
+### Why not use [`Redix`](https://hexdocs.pm/redix/Redix.html)?
+
+Because it doesn't support Redis Cluster. Since our project already depends on
+`eredis_cluster` (thus also depends on `eredis`), we wanted to stick with it.
