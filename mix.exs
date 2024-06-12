@@ -38,7 +38,6 @@ defmodule EredisSub.MixProject do
   defp package() do
     [
       licenses: ["Apache-2.0"],
-      organization: "loopsocial",
       maintainers: ["Alexandre Costa"],
       links: %{"GitHub" => @source_url}
     ]
