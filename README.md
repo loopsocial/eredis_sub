@@ -24,7 +24,7 @@ defmodule MyModule do
   @behaviour EredisSub.Handler
 
   @impl EredisSub.Handler
-  def handle(message, metadata) do
+  def handle_pubsub_message(message, metadata) do
     # Do something...
   end
 end

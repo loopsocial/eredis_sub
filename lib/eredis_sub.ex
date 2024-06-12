@@ -17,7 +17,7 @@ defmodule EredisSub do
         @behaviour EredisSub.Handler
 
         @impl EredisSub.Handler
-        def handle(message, metadata) do
+        def handle_pubsub_message(message, metadata) do
           # Do something...
         end
       end
@@ -63,7 +63,7 @@ defmodule EredisSub do
       ...> metadata = %{}
       ...>
       ...> defmodule FooBar do
-      ...>   def handle("foo", _metadata) do
+      ...>   def handle_pubsub_message(_message, _metadata) do
       ...>     # Do something...
       ...>   end
       ...> end

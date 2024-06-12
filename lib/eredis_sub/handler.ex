@@ -8,5 +8,5 @@ defmodule EredisSub.Handler do
   Receives a binary message and a metadata that can be customized upon subscription.
   Return value is ignored.
   """
-  @callback handle(message :: binary, metadata :: term) :: term
+  @callback handle_pubsub_message(message :: binary, metadata :: term) :: term
 end

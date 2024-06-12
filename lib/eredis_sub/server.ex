@@ -116,7 +116,7 @@ defmodule EredisSub.Server do
   defp apply_no_link(channel, handler_module, message, metadata) do
     Task.start(fn ->
       try do
-        handler_module.handle(message, metadata)
+        handler_module.handle_pubsub_message(message, metadata)
       rescue
         e ->
           error =

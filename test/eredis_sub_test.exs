@@ -17,7 +17,7 @@ defmodule EredisSubTest do
   end
 
   defmodule PingPong do
-    def handle("ping", metadata) do
+    def handle_pubsub_message("ping", metadata) do
       test_pid = Map.fetch!(metadata, :test_pid)
       send(test_pid, :pong)
     end
