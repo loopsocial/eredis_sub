@@ -25,7 +25,7 @@ defmodule EredisSub do
   Subscribe to a channel:
 
       metadata_example = %{subscribed_at: DateTime.utc_now()}
-      EredisSub.Server.subscribe("my_channel", {MyModule, :handle, metadata_example})
+      EredisSub.Server.subscribe("my_channel", MyModule, metadata_example)
 
   ### Add the following to your supervision tree:
 
@@ -42,11 +42,13 @@ defmodule EredisSub do
 
   @doc """
   Publish a message to a channel.
+  If successfull, returns the number of subscribers that received the message.
+  It should never error, unless there is a connection problem.
 
   ## Examples
 
       iex> EredisSub.publish("my_channel", "Hello, world!")
-      :ok
+      {:ok, 0}
   """
   def publish(channel, message) do
     Server.publish(channel, message)
@@ -66,11 +68,11 @@ defmodule EredisSub do
       ...>   end
       ...> end
       ...>
-      ...> EredisSub.subscribe(channel, {FooBar, :handle, metadata})
+      ...> EredisSub.subscribe(channel, FooBar, metadata)
       :ok
   """
-  def subscribe(channel, handler) do
-    Server.subscribe(channel, handler)
+  def subscribe(channel, handler_module, metadata) do
+    Server.subscribe(channel, handler_module, metadata)
   end
 
   @doc """

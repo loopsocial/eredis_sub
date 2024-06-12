@@ -23,13 +23,13 @@ defmodule EredisSubTest do
     end
   end
 
-  test "subscribes and publishes" do
+  test "subscribes, publishes and receives a message" do
     channel = "my super secret channel"
     metadata = %{test_pid: self()}
 
-    EredisSub.subscribe(channel, {PingPong, :handle, metadata})
-    EredisSub.publish(channel, "ping")
+    EredisSub.subscribe(channel, PingPong, metadata)
 
+    assert EredisSub.publish(channel, "ping") == {:ok, 1}
     assert_receive :pong
   end
 end
