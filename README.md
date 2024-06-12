@@ -2,7 +2,7 @@
 
 # EredisSub
 
-Wraps `eredis` and `eredis_sub` functionallity for Elixir usage.
+Wraps [`eredis`](https://hexdocs.pm/eredis/) and [`eredis_sub`](https://github.com/Nordix/eredis/blob/master/src/eredis_sub.erl) functionallity for Elixir usage.
 
 - Publishes binary messages to Redis Pub/Sub channels.
 - Subscribes to channels and calls a handler function when a message is received.
@@ -79,4 +79,4 @@ to how [`:telemetry`](https://hexdocs.pm/telemetry/readme.html) attaches handler
 
 We sacrificed flexibility on client process architecture, for a simpler mental model.
 If you need to handle message passing or a pool of processes, for example to handle
-heavier loads, use `:eredis` directly.
+heavier loads, use [`eredis`](https://hexdocs.pm/eredis/) directly.
