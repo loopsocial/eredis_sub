@@ -1,3 +1,5 @@
+# THIS PACKAGE IS UNMAINTAINED, AND RETIRED FROM HEX.PM
+
 ![Elixir CI](https://github.com/loopsocial/eredis_sub/actions/workflows/elixir.yml/badge.svg)
 ![Hex.pm Version](https://img.shields.io/hexpm/v/eredis_sub?color=blue)
 
