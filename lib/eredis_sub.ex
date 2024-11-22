@@ -86,4 +86,16 @@ defmodule EredisSub do
   def unsubscribe_all(channel) do
     Server.unsubscribe_all(channel)
   end
+
+  @doc """
+  Fetches all the channels the client is currently subscribing to.
+
+  ## Examples
+
+      iex> EredisSub.channels()
+      ["channel_1", "channel_2"]
+  """
+  def channels() do
+    Server.channels()
+  end
 end
