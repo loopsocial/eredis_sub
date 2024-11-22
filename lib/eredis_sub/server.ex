@@ -91,7 +91,7 @@ defmodule EredisSub.Server do
   end
 
   def handle_call(:channels, _from, state) do
-    response = :eredis_sub.channels(__MODULE__)
+    response = :eredis_sub.channels(state.sub_conn)
 
     {:reply, response, state}
   end
