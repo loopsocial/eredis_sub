@@ -29,6 +29,10 @@ defmodule EredisSub.Server do
     GenServer.call(name, {:unsubscribe_all, channel})
   end
 
+  def channels(name \\ __MODULE__) do
+    GenServer.call(name, :channels)
+  end
+
   # Private API
   def init(config) do
     eredis_config = Enum.map(config, &convert_elixir_to_erlang_option/1)
@@ -84,6 +88,12 @@ defmodule EredisSub.Server do
       end
 
     {:reply, response, %{state | subscriptions: subscriptions}}
+  end
+
+  def handle_call(:channels, _from, state) do
+    response = :eredis_sub.channels(__MODULE__)
+
+    {:reply, response, state}
   end
 
   def handle_info({:message, channel, msg, _client_pid}, state) do
