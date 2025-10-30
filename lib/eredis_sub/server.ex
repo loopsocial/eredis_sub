@@ -30,13 +30,19 @@ defmodule EredisSub.Server do
   end
 
   # Private API
+  @impl true
   def init(config) do
     eredis_config = Enum.map(config, &convert_elixir_to_erlang_option/1)
+    {:ok, %{pub_conn: nil, sub_conn: nil, subscriptions: %{}}, {:continue, eredis_config}}
+  end
+
+  @impl true
+  def handle_continue(eredis_config, state) do
     {:ok, pub_conn} = :eredis.start_link(eredis_config)
     {:ok, sub_conn} = :eredis_sub.start_link(eredis_config)
     :ok = :eredis_sub.controlling_process(sub_conn)
-
-    {:ok, %{pub_conn: pub_conn, sub_conn: sub_conn, subscriptions: %{}}}
+    state = %{state | pub_conn: pub_conn, sub_conn: sub_conn}
+    {:noreply, state}
   end
 
   defp convert_elixir_to_erlang_option({key, value}) do
@@ -47,6 +53,7 @@ defmodule EredisSub.Server do
     end
   end
 
+  @impl true
   def handle_call({:publish, channel, message}, _from, state) do
     command = Enum.map(["PUBLISH", channel, message], &String.to_charlist/1)
 
@@ -58,6 +65,7 @@ defmodule EredisSub.Server do
     {:reply, response, state}
   end
 
+  @impl true
   def handle_call({:subscribe, channel, handler_module, metadata}, _from, state) do
     response = :eredis_sub.subscribe(state.sub_conn, [String.to_charlist(channel)])
 
@@ -73,6 +81,7 @@ defmodule EredisSub.Server do
     {:reply, response, %{state | subscriptions: subscriptions}}
   end
 
+  @impl true
   def handle_call({:unsubscribe_all, channel}, _from, state) do
     response = :eredis_sub.unsubscribe(state.sub_conn, [String.to_charlist(channel)])
 
@@ -86,6 +95,7 @@ defmodule EredisSub.Server do
     {:reply, response, %{state | subscriptions: subscriptions}}
   end
 
+  @impl true
   def handle_info({:message, channel, msg, _client_pid}, state) do
     channel = to_string(channel)
     subscriptions = Map.get(state.subscriptions, channel, [])
@@ -98,16 +108,19 @@ defmodule EredisSub.Server do
     {:noreply, state}
   end
 
+  @impl true
   def handle_info({:subscribed, _channel, _client_pid}, state) do
     :eredis_sub.ack_message(state.sub_conn)
     {:noreply, state}
   end
 
+  @impl true
   def handle_info({:unsubscribed, _channel, _client_pid}, state) do
     :eredis_sub.ack_message(state.sub_conn)
     {:noreply, state}
   end
 
+  @impl true
   def handle_info(msg, state) do
     Logger.info("[#{__MODULE__}] Unhandled message: #{inspect(msg)}.")
     {:noreply, state}
